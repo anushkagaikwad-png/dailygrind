@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+const API = "http://acela.proxy.rlwy.net:17664";
 
 const SUBJECTS = ["DSA", "OS", "DBMS", "CN", "OOP", "System Design", "Other"];
 
@@ -49,17 +50,17 @@ function Tag({ children, color }) {
 }
 
 export default function DailyTracker() {
-  const [logs, setLogs] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("daily_logs") || "[]"); } catch { return []; }
-  });
+const [logs, setLogs] = useState([]);
   const [tab, setTab] = useState("entry");
   const [form, setForm] = useState(defaultForm);
   const [saved, setSaved] = useState(false);
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("daily_logs", JSON.stringify(logs));
-  }, [logs]);
+    fetch(`${API}/api/logs`)
+      .then(r => r.json())
+      .then(setLogs);
+  }, []);
 
   const stats = useMemo(() => {
     if (!logs.length) return { streak: 0, totalDSA: 0, totalCore: 0, totalDev: 0, avgSleep: 0 };
@@ -93,7 +94,11 @@ export default function DailyTracker() {
         if (!window.confirm(`Entry for ${form.date} already exists. Overwrite?`)) return;
         setLogs(logs.map(l => l.date === form.date ? { ...form, id: l.id } : l));
       } else {
-        setLogs([...logs, { ...form, id: Date.now() }]);
+        fetch(`${API}/api/logs`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(form)
+}).then(() => fetch(`${API}/api/logs`).then(r => r.json()).then(setLogs));
       }
     }
     setForm(defaultForm);
