@@ -7,10 +7,10 @@ app.use(cors());
 app.use(express.json());
 
 const pool = mysql.createPool({
-  host: "mysql-production-31a97.up.railway.app",
-  port: 3306,
+  host: "acela.proxy.rlwy.net",
+  port: 31822,
   user: "root",
-  password: "LehtmNHnzWRoPbJgkmRPGojaTTUpaoLB",
+  password: "DItKYBtMQfvppPlRkKOPFppwPqkXikql",
   database: "railway",
   ssl: { rejectUnauthorized: false },
   waitForConnections: true,
