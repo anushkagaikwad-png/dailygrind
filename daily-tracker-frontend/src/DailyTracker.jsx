@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-const API = "http://acela.proxy.rlwy.net:17664";
+const API = "https://dailygrind-production.up.railway.app";
 
 const SUBJECTS = ["DSA", "OS", "DBMS", "CN", "OOP", "System Design", "Other"];
 
