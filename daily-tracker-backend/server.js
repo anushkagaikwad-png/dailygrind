@@ -17,10 +17,26 @@ const dbConfig = {
   connectionLimit: 10,
 };
 
+const ADMIN_KEY = (process.env.ADMIN_KEY || "GrindPass2026").trim();
+
 // Log warning if required variables are missing
 if (!dbConfig.host || !dbConfig.password) {
   console.warn("Database host or password environment variable is missing. Connection might fail.");
 }
+
+// Middleware to authorize database modifications
+const authorizeAdmin = (req, res, next) => {
+  if (req.method === "GET") {
+    return next();
+  }
+  const key = req.headers["x-admin-key"];
+  if (!key || key.trim() !== ADMIN_KEY) {
+    return res.status(401).json({ error: "Unauthorized: Invalid or missing admin passcode." });
+  }
+  next();
+};
+
+app.use(authorizeAdmin);
 
 const pool = mysql.createPool(dbConfig);
 

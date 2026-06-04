@@ -127,6 +127,36 @@ export default function DailyTracker() {
     };
   }, [logs]);
 
+  // Auth passcode helpers
+  const getAdminKey = () => {
+    let key = localStorage.getItem("admin_key");
+    if (!key) {
+      key = prompt("Enter Admin Passcode to save changes:");
+      if (key) {
+        localStorage.setItem("admin_key", key);
+      }
+    }
+    return key || "";
+  };
+
+  const getHeaders = () => ({
+    "Content-Type": "application/json",
+    "x-admin-key": getAdminKey()
+  });
+
+  const handleResponse = async (res) => {
+    if (res.status === 401) {
+      localStorage.removeItem("admin_key");
+      alert("Invalid passcode! Passcode cleared. Please try again.");
+      throw new Error("Unauthorized");
+    }
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Request failed");
+    }
+    return res.json();
+  };
+
   const handleChange = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSubmit = () => {
@@ -134,9 +164,10 @@ export default function DailyTracker() {
     if (editId !== null) {
       fetch(`${API}/api/logs/${editId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: getHeaders(),
         body: JSON.stringify(form)
       })
+      .then(handleResponse)
       .then(() => fetch(`${API}/api/logs`).then(r => r.json()).then(setLogs))
       .then(() => {
         setEditId(null);
@@ -152,9 +183,10 @@ export default function DailyTracker() {
         if (!window.confirm(`Entry for ${form.date} already exists. Overwrite?`)) return;
         fetch(`${API}/api/logs/${existing.id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: getHeaders(),
           body: JSON.stringify(form)
         })
+        .then(handleResponse)
         .then(() => fetch(`${API}/api/logs`).then(r => r.json()).then(setLogs))
         .then(() => {
           setForm(defaultForm);
@@ -166,9 +198,10 @@ export default function DailyTracker() {
       } else {
         fetch(`${API}/api/logs`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: getHeaders(),
           body: JSON.stringify(form)
         })
+        .then(handleResponse)
         .then(() => fetch(`${API}/api/logs`).then(r => r.json()).then(setLogs))
         .then(() => {
           setForm(defaultForm);
@@ -190,8 +223,12 @@ export default function DailyTracker() {
   const handleDelete = (id) => {
     if (window.confirm("Delete this entry?")) {
       fetch(`${API}/api/logs/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
+        headers: {
+          "x-admin-key": getAdminKey()
+        }
       })
+      .then(handleResponse)
       .then(() => fetch(`${API}/api/logs`).then(r => r.json()).then(setLogs))
       .catch(err => console.error("Error deleting entry:", err));
     }
@@ -368,7 +405,7 @@ export default function DailyTracker() {
                   background: "#fff", border: "1px solid #D3D1C7",
                   borderRadius: 12, padding: "14px 16px"
                 }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifySpace: "space-between", marginBottom: 10 }}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: "#1A1A1A" }}>
                       {new Date(log.date + "T12:00:00").toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}
                     </div>
