@@ -6,16 +6,43 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const pool = mysql.createPool({
-  host: "acela.proxy.rlwy.net",
-  port: 31822,
-  user: "root",
-  password: "DItKYBtMQfvppPlRkKOPFppwPqkXikql",
-  database: "railway",
+const dbConfig = {
+  host: process.env.DB_HOST || "acela.proxy.rlwy.net",
+  port: parseInt(process.env.DB_PORT || "31822", 10),
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "DItKYBtMQfvppPlRkKOPFppwPqkXikql",
+  database: process.env.DB_NAME || "railway",
   ssl: { rejectUnauthorized: false },
   waitForConnections: true,
   connectionLimit: 10,
-});
+};
+
+const pool = mysql.createPool(dbConfig);
+
+// Helper function to initialize database
+async function initDB() {
+  try {
+    console.log("Checking and initializing database table...");
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS daily_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        date VARCHAR(255) UNIQUE,
+        dsa_questions INT DEFAULT 0,
+        core_subject VARCHAR(255),
+        core_hours DECIMAL(5,2) DEFAULT 0.00,
+        development_hours DECIMAL(5,2) DEFAULT 0.00,
+        sleep_hours DECIMAL(5,2) DEFAULT 0.00,
+        notes TEXT
+      );
+    `);
+    console.log("Database table daily_logs is ready.");
+  } catch (err) {
+    console.error("Error initializing database table:", err.message);
+  }
+}
+
+// Call initDB when starting the app
+initDB();
 
 app.get("/api/logs", async (req, res) => {
   try {
@@ -38,7 +65,7 @@ app.post("/api/logs", async (req, res) => {
          sleep_hours=VALUES(sleep_hours), notes=VALUES(notes)`,
       [date, dsa_questions || 0, core_subject, core_hours || 0, development_hours || 0, sleep_hours || 0, notes || ""]
     );
-    const [rows] = await pool.query("SELECT * FROM daily_logs WHERE id = ?", [result.insertId]);
+    const [rows] = await pool.query("SELECT * FROM daily_logs WHERE date = ?", [date]);
     res.json(rows[0] || { message: "updated" });
   } catch (err) {
     res.status(500).json({ error: err.message });
