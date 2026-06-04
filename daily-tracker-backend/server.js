@@ -7,11 +7,11 @@ app.use(cors());
 app.use(express.json());
 
 const dbConfig = {
-  host: process.env.DB_HOST || "acela.proxy.rlwy.net",
-  port: parseInt(process.env.DB_PORT || "31822", 10),
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "DItKYBtMQfvppPlRkKOPFppwPqkXikql",
-  database: process.env.DB_NAME || "railway",
+  host: (process.env.DB_HOST || "acela.proxy.rlwy.net").trim(),
+  port: parseInt((process.env.DB_PORT || "31822").toString().trim(), 10),
+  user: (process.env.DB_USER || "root").trim(),
+  password: (process.env.DB_PASSWORD || "DItKYBtMQfvppPlRkKOPFppwPqkXikql").trim(),
+  database: (process.env.DB_NAME || "railway").trim(),
   ssl: { rejectUnauthorized: false },
   waitForConnections: true,
   connectionLimit: 10,
