@@ -1,21 +1,21 @@
-# ⚡ Daily Grind Tracker
+# Daily Grind Tracker
 
-A modern web application to track, reflect, and optimize your daily coding grind. Log your DSA questions solved, core subject study hours, development hours, sleep, and notes.
+A modern web application to track, reflect, and optimize daily coding habits. Log DSA questions solved, core subject study hours, development hours, sleep, and notes.
 
-## 🚀 Live Demo
-- **Frontend (React)**: [https://dailygrind-nu.vercel.app/](https://dailygrind-nu.vercel.app/)
-- **Backend API (Express)**: [https://dailygrind-production.up.railway.app/api/logs](https://dailygrind-production.up.railway.app/api/logs)
-
----
-
-## 🛠️ Tech Stack
-- **Frontend**: React (hosted on Vercel)
-- **Backend**: Node.js & Express (hosted on Railway)
-- **Database**: MySQL (hosted on Railway)
+## Live Demo
+- Frontend (React): https://dailygrind-nu.vercel.app/
+- Backend API (Express): https://dailygrind-production.up.railway.app/api/logs
 
 ---
 
-## 📁 Repository Structure
+## Tech Stack
+- Frontend: React (hosted on Vercel)
+- Backend: Node.js & Express (hosted on Railway)
+- Database: MySQL (hosted on Railway)
+
+---
+
+## Repository Structure
 This repository is structured as a monorepo:
 ```
 dailygrind/
@@ -23,14 +23,14 @@ dailygrind/
 │   ├── src/                 # Application source files
 │   └── package.json
 ├── daily-tracker-backend/   # Express Backend & API (configured for Railway)
-│   ├── server.js            # Main server entrypoint (uses environment variables & trims)
+│   ├── server.js            # Main server entrypoint (reads secure env vars)
 │   └── package.json
 └── README.md                # Project documentation
 ```
 
 ---
 
-## 💾 Database Schema
+## Database Schema
 The MySQL database stores records in a table named `daily_logs`. The backend automatically initializes this schema on startup:
 
 | Column | Type | Description |
@@ -46,10 +46,10 @@ The MySQL database stores records in a table named `daily_logs`. The backend aut
 
 ---
 
-## 💻 Running Locally
+## Running Locally
 
 ### 1. Run the Backend
-1. Go to the backend folder:
+1. Navigate to the backend folder:
    ```bash
    cd daily-tracker-backend
    ```
@@ -57,14 +57,19 @@ The MySQL database stores records in a table named `daily_logs`. The backend aut
    ```bash
    npm install
    ```
-3. Start the Express server:
+3. Set the database environment variables in your local terminal or `.env` file:
+   - `DB_HOST`
+   - `DB_PASSWORD`
+   - `DB_USER`
+   - `DB_PORT`
+   - `DB_NAME`
+4. Start the Express server:
    ```bash
    npm start
    ```
-   *The server runs by default on `http://localhost:3001`.*
 
 ### 2. Run the Frontend
-1. Go to the frontend folder:
+1. Navigate to the frontend folder:
    ```bash
    cd daily-tracker-frontend
    ```
@@ -76,4 +81,3 @@ The MySQL database stores records in a table named `daily_logs`. The backend aut
    ```bash
    npm start
    ```
-   *The React app will open automatically at `http://localhost:3000`.*
